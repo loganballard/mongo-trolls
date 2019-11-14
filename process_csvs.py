@@ -1,11 +1,16 @@
 from csv import DictReader
 from os import listdir, getcwd, path
 from pymongo import MongoClient
-from threading import Thread
+MONGO_HOST = 'localhost'
+MONGO_PORT = 27017
 
-client = MongoClient()
-mongo_db = client.tweet_db
-tweet_collection = mongo_db.tweet_collection
+client = MongoClient(host=MONGO_HOST, port=MONGO_PORT, appname='test_scripts')
+
+
+def create_database():
+    mongo_db = client.tweet_db
+    tweet_collection = mongo_db.tweet_collection
+
 
 
 def get_info_and_insert_into_collection(filepath):

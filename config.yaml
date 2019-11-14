@@ -1,0 +1,16 @@
+host: localhost
+port: 27017
+db: tweet_db
+debug: true
+replicaset: false
+tweet_folder: tweets
+collections:
+  - default:
+      name: tweets
+      indices:
+        - ind_1: tweetid
+          ind_2: timestamp
+    hashtags:
+      name: hashtags
+      indices:
+        - ind_1: count

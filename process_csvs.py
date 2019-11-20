@@ -34,39 +34,23 @@ def process_hashtags_in_tweets(row, cache_tags):
 
 
 def insert_dict_into_collection(collection, dict_to_insert, debug=False):
+    insert_list = []
     for key, count in dict_to_insert.items():
-        collection.insert_one({
+        insert_list.append({
             "hashtag": key,
             "count": count
         })
-    if debug:
-        print(f"inserted hashtag dict into: {collection.name}")
-        print(f"inserted count: {len(dict_to_insert)}")
+        if len(insert_list) > 10000:
+            insert_list_into_collection(collection, insert_list, debug)
+            insert_list = []
+        insert_list_into_collection(collection, insert_list, debug)
 
 
 def insert_list_into_collection(collection, list_to_insert, debug=False):
-    collection.insert_many(list_to_insert)
+    res = collection.insert_many(list_to_insert)
     if debug:
-        global INSERT_COUNT
-        INSERT_COUNT += len(list_to_insert)
         print(f"inserting list into: {collection.name}")
-        print(f"first list item: {list_to_insert[0]}")
-        print(f"inserted count: {INSERT_COUNT}")
-
-
-def get_info_and_insert_into_collection(filepath, collection_map, cache_tags, debug):
-    tweet_list_to_insert = []
-    default_collection = collection_map.get('tweets', None)
-    with open(filepath, newline='', encoding='utf-8') as csvfile:
-        r = DictReader(csvfile, fieldnames=None, delimiter=',', quotechar='"')
-        for row in r:
-            if default_collection:
-                tweet_list_to_insert.append(dict(row))
-            if len(tweet_list_to_insert) > 100:
-                insert_list_into_collection(default_collection, tweet_list_to_insert, debug)
-                tweet_list_to_insert = []
-            process_hashtags_in_tweets(row=row, cache_tags=cache_tags)
-
+        print(f"inserted {res.inserted_count} records")
 
 
 def get_db_from_config(config):
@@ -76,15 +60,39 @@ def get_db_from_config(config):
     return db
 
 
+def process_file(file_path, tweet_collection, hashtag_collection, cache_tags, debug=False):
+    raw_tweet_list = []
+    with open(file_path, newline='', encoding='utf-8') as csvfile:
+        r = DictReader(csvfile, fieldnames=None, delimiter=',', quotechar='"')
+        for row in r:
+            if tweet_collection:
+                raw_tweet_list.append(row)
+                if len(raw_tweet_list) > 10000:
+                    insert_list_into_collection(tweet_collection, raw_tweet_list, debug)
+                    raw_tweet_list = []
+            if hashtag_collection:
+                process_hashtags_in_tweets(row=row, cache_tags=cache_tags)
+        if tweet_collection and len(raw_tweet_list) > 0:
+            insert_list_into_collection(tweet_collection, raw_tweet_list, debug)
+
+
+def check_for_collections(collections_map):
+    hashtag_collection = collections_map.get("hashtags", None)
+    tweet_collection = collections_map.get("tweets", None)
+    if not tweet_collection and not hashtag_collection:
+        raise Exception("no collections were found to add to!")
+    return hashtag_collection, tweet_collection
+
+
 def process_files(config, collections_map, debug=False):
+    hashtag_collection, tweet_collection = check_for_collections(collections_map)
     tweets_path = getcwd() + path.sep + config.get('tweet_folder', 'tweets')
     cache_tags = {}
     for file_name in listdir(tweets_path):
         file_path = tweets_path + path.sep + file_name
-        get_info_and_insert_into_collection(file_path, collections_map, cache_tags, debug)
-    hashtag_collection = collections_map.get('hashtags', None)
-    if hashtag_collection:
-        insert_dict_into_collection(hashtag_collection, cache_tags, debug)
+        process_file(file_path, tweet_collection, hashtag_collection, cache_tags, debug)
+    if cache_tags and hashtag_collection:
+        insert_dict_into_collection(collections_map.get('hashtags'), cache_tags, debug)
 
 
 def get_config(config_file_path='config.yaml'):

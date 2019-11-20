@@ -14,10 +14,13 @@ def populate_data(config, force=False, debug=False):
     collections = collection_candidates.copy()
     if not force:
         for name, collection in collection_candidates.items():
-            if collection.estimated_document_count() > 0:
+            if collection.count_documents({}) > 0:
                 print(f"collection {collection.name} not empty, removing!")
                 collections.pop(name)
-    pc.process_files(config, collections, debug)
+    try:
+        pc.process_files(config, collections, debug)
+    except Exception as e:
+        print(e)
 
 
 def destroy_data(config, debug=False):

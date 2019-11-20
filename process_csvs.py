@@ -103,4 +103,4 @@ def clear_database(config):
         col.drop_indexes()
 
 if __name__ == '__main__':
-    clear_database(get_config())
+    process_files(get_config())

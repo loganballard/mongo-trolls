@@ -1,4 +1,6 @@
-# Loading the tweets into a mongo database
+# Loading Russian Troll Tweets into a mongo database for Analytics
+
+#### Part of CS558 at Portland State
 
 to obtain the tweets:
 

@@ -43,6 +43,7 @@ def insert_dict_into_collection(collection, dict_to_insert, debug=False):
         if len(insert_list) > 10000:
             insert_list_into_collection(collection, insert_list, debug)
             insert_list = []
+    if len(insert_list) > 0:
         insert_list_into_collection(collection, insert_list, debug)
 
 
@@ -50,7 +51,8 @@ def insert_list_into_collection(collection, list_to_insert, debug=False):
     res = collection.insert_many(list_to_insert)
     if debug:
         print(f"inserting list into: {collection.name}")
-        print(f"inserted {res.inserted_count} records")
+        print(f"example inserted: {list_to_insert[0]}")
+        print(f"inserted {len(res.inserted_ids)} records")
 
 
 def get_db_from_config(config):
@@ -100,9 +102,13 @@ def get_config(config_file_path='config.yaml'):
         return load(config_file.read(), Loader=BaseLoader)
 
 
-def clear_database(config):
+def clear_database(config, debug=False):
     db = get_db_from_config(config)
     collection_map = get_collections(config, db)
     for col in collection_map.values():
-        col.delete_many({})  # DELETES ALL DOCS!
+        if debug:
+            print(f"deleting all values from {col.name} collection")
+        col.delete_many({})
         col.drop_indexes()
+        if debug and col.count({}) == 0:
+            print(f"deletion from {col.name} successful")

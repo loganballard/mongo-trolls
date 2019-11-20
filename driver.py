@@ -27,11 +27,11 @@ def destroy_data(config, debug=False):
     if debug:
         print("erasing docs from collections")
     try:
-        pc.clear_database(config)
+        pc.clear_database(config, debug)
         if debug:
             print("collections cleared")
     except Exception as e:
-        print(e.with_traceback())
+        print(e)
 
 
 def process_args(args):

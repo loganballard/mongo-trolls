@@ -7,8 +7,8 @@ tweet_folder: tweets
 collections:
   - name: tweets
     indices:
-      - tweetid
-      - timestamp
+      - tweet_id
+      - publish_date
   - name: hashtags
     indices:
       - count

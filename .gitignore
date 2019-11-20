@@ -1,2 +1,4 @@
 .idea
 tweets/*.csv
+__pycache__
+venv

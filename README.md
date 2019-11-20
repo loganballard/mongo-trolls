@@ -11,4 +11,10 @@ to obtain the tweets:
 - create a local mongo running instance 
     - install the `mongo` / `mongos` / `mongod` binaries
     - `$ mongod`
-- `$ python process_csvs.py`
+- Edit the `config.yaml` file with your specifications.  By default the specifications should be correct for the default mongodb setup
+- Use the command line driver to insert all these records into your local mongodb. 
+- `$ python driver.py -h`
+    - outputs the help command
+- `$ python driver.py`
+    - without any arguments, the driver loads all collections specified in the `config.yaml` file in the root directory and loads those collections with tweets from `./tweets`
+- `$ python driver.py `

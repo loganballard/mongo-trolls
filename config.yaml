@@ -1,14 +1,13 @@
 host: localhost
 port: 27017
 db: tweet_db
-debug: true
 replicaset: false
 tweet_folder: tweets
 collections:
   - name: tweets
     indices:
-      - tweetid
-      - timestamp
+      - tweet_id
+      - publish_date
   - name: hashtags
     indices:
       - count

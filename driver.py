@@ -8,17 +8,17 @@ def get_desc():
     it wants to create are already populated, and if so it will quit (unless the -f flag is supplied)."""
 
 
-def populate_data(config, force=False, debug=False):
+def populate_data(config, force=False, case_sensitive=False, debug=False):
     db = pc.get_db_from_config(config)
     collection_candidates = pc.get_collections(config, db, debug)
     collections = collection_candidates.copy()
     if not force:
         for name, collection in collection_candidates.items():
             if collection.count_documents({}) > 0:
-                print(f"collection {collection.name} not empty, removing!")
+                print(f"collection {collection.name} not empty, not populating!")
                 collections.pop(name)
     try:
-        pc.process_files(config, collections, debug)
+        pc.process_files(config, collections, case_sensitive, debug=debug)
     except Exception as e:
         print(e)
 
@@ -41,7 +41,7 @@ def process_args(args):
     if args.delete:
         destroy_data(config, debug)
     else:
-        populate_data(config, args.force, debug)
+        populate_data(config, args.force, args.sensitive, debug)
 
 
 if __name__ == "__main__":
@@ -51,5 +51,6 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--delete", action="store_true", help="delete all docs and indices from all collections " +
                                                                     "in config file.  Quit afterwards")
     parser.add_argument("-f", "--force", action="store_true", help="skip population checks and force-populate data")
+    parser.add_argument("-s", "--sensitive", action="store_true", help="keep original case (upper/lower) for hashtags")
     args = parser.parse_args()
     process_args(args)

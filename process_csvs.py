@@ -5,6 +5,7 @@ from yaml import load, BaseLoader
 
 INSERT_COUNT = 0
 
+
 def get_collections(config, db, debug=False):
     collection_map = {}
     for col in config.get('collections', []):
@@ -56,15 +57,16 @@ def insert_list_into_collection(collection, list_to_insert, debug=False):
 def get_info_and_insert_into_collection(filepath, collection_map, cache_tags, debug):
     tweet_list_to_insert = []
     default_collection = collection_map.get('tweets', None)
-    if default_collection:
-        with open(filepath, newline='', encoding='utf-8') as csvfile:
-            r = DictReader(csvfile, fieldnames=None, delimiter=',', quotechar='"')
-            for row in r:
+    with open(filepath, newline='', encoding='utf-8') as csvfile:
+        r = DictReader(csvfile, fieldnames=None, delimiter=',', quotechar='"')
+        for row in r:
+            if default_collection:
                 tweet_list_to_insert.append(dict(row))
-                process_hashtags_in_tweets(row=row, cache_tags=cache_tags)
-                if len(tweet_list_to_insert) > 100:
-                    insert_list_into_collection(default_collection, tweet_list_to_insert, debug)
-                    tweet_list_to_insert = []
+            if len(tweet_list_to_insert) > 100:
+                insert_list_into_collection(default_collection, tweet_list_to_insert, debug)
+                tweet_list_to_insert = []
+            process_hashtags_in_tweets(row=row, cache_tags=cache_tags)
+
 
 
 def get_db_from_config(config):

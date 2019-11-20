@@ -41,11 +41,12 @@ def process_args(args):
         populate_data(config, args.force, debug)
 
 
-parser = argparse.ArgumentParser(description=get_desc())
-parser.add_argument("-c", "--config", type=str, help="path to the config yaml (default: ./config.yaml)")
-parser.add_argument("-v", "--verbose", action="store_true", help="print verbose output")
-parser.add_argument("-d", "--delete", action="store_true", help="delete all docs and indices from all collections " +
-                                                                "in config file.  Quit afterwards")
-parser.add_argument("-f", "--force", action="store_true", help="skip population checks and force-populate data")
-args = parser.parse_args()
-process_args(args)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=get_desc())
+    parser.add_argument("-c", "--config", type=str, help="path to the config yaml (default: ./config.yaml)")
+    parser.add_argument("-v", "--verbose", action="store_true", help="print verbose output")
+    parser.add_argument("-d", "--delete", action="store_true", help="delete all docs and indices from all collections " +
+                                                                    "in config file.  Quit afterwards")
+    parser.add_argument("-f", "--force", action="store_true", help="skip population checks and force-populate data")
+    args = parser.parse_args()
+    process_args(args)

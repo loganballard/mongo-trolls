@@ -1,2 +1,3 @@
 .idea
 tweets/*.csv
+__pycache__

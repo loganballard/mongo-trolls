@@ -1,7 +1,6 @@
 host: localhost
 port: 27017
 db: tweet_db
-debug: true
 replicaset: false
 tweet_folder: tweets
 collections:
